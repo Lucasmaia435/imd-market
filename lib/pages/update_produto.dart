@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/components/screen.dart';
+import 'package:mobile/database/database_helper.dart';
+import 'package:mobile/models/product.dart';
 
 class UpdateProduto extends StatelessWidget {
-  const UpdateProduto({super.key});
+  final Product product;
+
+  const UpdateProduto({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
+    final codeController = TextEditingController(text: product.code);
+    final nameController = TextEditingController(text: product.name);
+    final descriptionController =
+        TextEditingController(text: product.description);
+    final storageController =
+        TextEditingController(text: product.storage.toString());
+
     return Screen(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -14,45 +25,39 @@ class UpdateProduto extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
-                "LISTA DE PRODUTO",
+                "ATUALIZAR PRODUTO",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
               ),
             ),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Código produto:"),
-                TextField(),
+                const Text("Código produto:"),
+                TextField(controller: codeController, readOnly: true),
               ],
             ),
-            const SizedBox(
-              height: 8,
-            ),
-            const Column(
+            const SizedBox(height: 8),
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Nome produto:"),
-                TextField(),
+                const Text("Nome produto:"),
+                TextField(controller: nameController),
               ],
             ),
-            const SizedBox(
-              height: 8,
-            ),
-            const Column(
+            const SizedBox(height: 8),
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Descrição do produto:"),
-                TextField(),
+                const Text("Descrição do produto:"),
+                TextField(controller: descriptionController),
               ],
             ),
-            const SizedBox(
-              height: 8,
-            ),
-            const Column(
+            const SizedBox(height: 8),
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Estoque produto:"),
-                TextField(),
+                const Text("Estoque produto:"),
+                TextField(controller: storageController),
               ],
             ),
             Padding(
@@ -62,16 +67,41 @@ class UpdateProduto extends StatelessWidget {
                 children: [
                   FilledButton(
                     style: FilledButton.styleFrom(
-                      shape: const BeveledRectangleBorder(),
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Alterar"),
+                        shape: const BeveledRectangleBorder()),
+                    onPressed: () async {
+                      final updatedProduct = Product(
+                        code: codeController.text,
+                        name: nameController.text,
+                        description: descriptionController.text,
+                        storage: int.parse(storageController.text),
+                      );
+                      try {
+                        await DatabaseHelper().updateProduct(updatedProduct);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Produto atualizado com sucesso!'),
+                          ),
+                        );
+                        Navigator.pop(context);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Erro ao atualizar produto: $e'),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text("Atualizar"),
                   ),
                   FilledButton(
                     style: FilledButton.styleFrom(
-                      shape: const BeveledRectangleBorder(),
-                    ),
-                    onPressed: () {},
+                        shape: const BeveledRectangleBorder()),
+                    onPressed: () {
+                      codeController.clear();
+                      nameController.clear();
+                      descriptionController.clear();
+                      storageController.clear();
+                    },
                     child: const Text("Limpar"),
                   ),
                 ],

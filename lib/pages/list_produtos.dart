@@ -1,23 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/components/screen.dart';
+import 'package:mobile/database/database_helper.dart';
 import 'package:mobile/models/product.dart';
+import 'package:mobile/pages/update_produto.dart';
 
 class ListProdutos extends StatelessWidget {
   const ListProdutos({super.key});
 
   @override
   Widget build(BuildContext context) {
-    List<Product> products = List.generate(
-      10,
-      (i) => Product(
-        code: i,
-        name: "Item $i",
-        description: "Sub item $i",
-        storage: i,
-      ),
-    );
-
     return Screen(
+      needsScrool: false,
       body: Column(
         children: [
           const Padding(
@@ -28,36 +21,38 @@ class ListProdutos extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: ListView.separated(
-              separatorBuilder: (context, index) => const Divider(
-                height: 1,
-              ),
-              itemCount: products.length,
-              itemBuilder: (_, i) {
-                return ListTile(
-                  title: Text(
-                    products[i].name,
-                    style: const TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  subtitle: Text(
-                    products[i].description,
-                    style: const TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                );
+            child: FutureBuilder<List<Product>>(
+              future: DatabaseHelper().getProducts(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text('Erro ao carregar produtos'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('Nenhum produto encontrado'));
+                } else {
+                  final products = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      final product = products[index];
+                      return ListTile(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => UpdateProduto(
+                              product: product,
+                            ),
+                          ),
+                        ),
+                        title: Text(product.name),
+                        subtitle: Text(
+                            'Código: ${product.code}, Estoque: ${product.storage}'),
+                      );
+                    },
+                  );
+                }
               },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                shape: const BeveledRectangleBorder(),
-              ),
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                "Voltar",
-                textAlign: TextAlign.center,
-              ),
             ),
           ),
         ],

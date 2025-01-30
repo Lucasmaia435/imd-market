@@ -7,60 +7,69 @@ class Login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final usernameController = TextEditingController();
+    final passwordController = TextEditingController();
+
     return Screen(
       body: Padding(
-        padding: const EdgeInsets.all(40.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const Text(
-              "Login:",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                hintText: "Login",
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                "LOGIN",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
               ),
             ),
-            const SizedBox(
-              height: 24,
+            TextField(
+              controller: usernameController,
+              decoration: const InputDecoration(
+                labelText: "Usuário",
+                hintText: "Usuário",
+              ),
             ),
-            const Text(
-              "Senha:",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const TextField(
-              decoration: InputDecoration(
+            const SizedBox(height: 16),
+            TextField(
+              controller: passwordController,
+              decoration: const InputDecoration(
+                labelText: "Senha",
                 hintText: "Senha",
               ),
+              obscureText: true,
             ),
-            const SizedBox(
-              height: 24,
-            ),
+            const SizedBox(height: 24),
             FilledButton(
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.all(32),
                 shape: const BeveledRectangleBorder(),
               ),
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const Home(),
-                  ),
-                );
+                final username = usernameController.text;
+                final password = passwordController.text;
+
+                if (username == 'admin' && password == 'admin') {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const Home(),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Login ou senha incorretos')),
+                  );
+                }
               },
               child: const Text("ENTRAR"),
             ),
-            const SizedBox(
-              height: 24,
-            ),
+            const SizedBox(height: 24),
             TextButton(
-              onPressed: () {},
-              child: Text(
-                "Esqueci minha senha/login",
-                style: TextStyle(color: Colors.blue[900]),
-              ),
-            )
+              onPressed: () {
+                // Ação para o botão de esqueci a senha
+              },
+              child: const Text("Esqueci a senha"),
+            ),
           ],
         ),
       ),

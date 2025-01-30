@@ -77,23 +77,6 @@ class Home extends StatelessWidget {
                   onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const UpdateProduto(),
-                    ),
-                  ),
-                  child: const Text(
-                    "Atualizar\nproduto",
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                FilledButton(
-                  style: FilledButton.styleFrom(
-                    fixedSize: const Size(130, 90),
-                    padding: const EdgeInsets.all(32),
-                    shape: const BeveledRectangleBorder(),
-                  ),
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
                       builder: (_) => const DeletarProduto(),
                     ),
                   ),

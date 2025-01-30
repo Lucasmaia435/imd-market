@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/components/screen.dart';
+import 'package:mobile/database/database_helper.dart';
 
 class DeletarProduto extends StatelessWidget {
   const DeletarProduto({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final codeController = TextEditingController();
+
     return Screen(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -18,11 +21,11 @@ class DeletarProduto extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
               ),
             ),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Código produto:"),
-                TextField(),
+                const Text("Código do produto:"),
+                TextField(controller: codeController),
               ],
             ),
             Padding(
@@ -32,16 +35,31 @@ class DeletarProduto extends StatelessWidget {
                 children: [
                   FilledButton(
                     style: FilledButton.styleFrom(
-                      shape: const BeveledRectangleBorder(),
-                    ),
-                    onPressed: () => Navigator.pop(context),
+                        shape: const BeveledRectangleBorder()),
+                    onPressed: () async {
+                      final code = codeController.text;
+                      try {
+                        await DatabaseHelper().deleteProduct(code);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Produto deletado com sucesso!')),
+                        );
+                        Navigator.pop(context);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text('Erro ao deletar produto: $e')),
+                        );
+                      }
+                    },
                     child: const Text("Deletar"),
                   ),
                   FilledButton(
                     style: FilledButton.styleFrom(
-                      shape: const BeveledRectangleBorder(),
-                    ),
-                    onPressed: () {},
+                        shape: const BeveledRectangleBorder()),
+                    onPressed: () {
+                      codeController.clear();
+                    },
                     child: const Text("Limpar"),
                   ),
                 ],
